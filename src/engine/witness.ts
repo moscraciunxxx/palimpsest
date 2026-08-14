@@ -1,4 +1,5 @@
-import { createImage, imageToCanvas } from "./pixels";
+import { registerGray } from "./collation";
+import { createImage, imageToCanvas, toGray } from "./pixels";
 import type { PipelineResult } from "./types";
 
 export interface WitnessReport {
@@ -26,7 +27,9 @@ function isInk(data: Uint8ClampedArray, i: number): boolean {
 export function compareWitness(primary: ImageData, secondary: ImageData): WitnessReport {
   const w = primary.width;
   const h = primary.height;
-  const b = secondary.width === w && secondary.height === h ? secondary : scaleImage(secondary, w, h);
+  const scaled = secondary.width === w && secondary.height === h ? secondary : scaleImage(secondary, w, h);
+  const reg = registerGray(toGray(primary), w, h, toGray(scaled), w, h);
+  const b = grayToInkImage(reg.data, w, h);
   const agreed = createImage(w, h, [243, 238, 228, 255]);
   const dissent = createImage(w, h, [243, 238, 228, 255]);
   let inkA = 0;
@@ -66,7 +69,7 @@ export function applyWitness(result: PipelineResult, secondPhoto: ImageData): {
   const report = compareWitness(result.layers.binary, secondPhoto);
   const notes = [
     ...result.notes.filter((n) => !n.startsWith("Dual-witness")),
-    `Dual-witness: ${(report.agreeRatio * 100).toFixed(0)}% of ink agrees with the second photograph. Disagreement is a hole, not a vote.`,
+    `Dual-witness: ${(report.agreeRatio * 100).toFixed(0)}% of ink agrees after collation. Disagreement is a hole, not a vote.`,
   ];
   return {
     report,
@@ -76,6 +79,17 @@ export function applyWitness(result: PipelineResult, secondPhoto: ImageData): {
       notes,
     },
   };
+}
+
+function grayToInkImage(gray: Float32Array, w: number, h: number): ImageData {
+  const img = createImage(w, h, [243, 238, 228, 255]);
+  for (let p = 0, i = 0; p < gray.length; p++, i += 4) {
+    const v = Math.max(0, Math.min(255, Math.round(gray[p] * 255)));
+    img.data[i] = v;
+    img.data[i + 1] = v;
+    img.data[i + 2] = v;
+  }
+  return img;
 }
 
 export function leafFingerprint(img: ImageData): string {

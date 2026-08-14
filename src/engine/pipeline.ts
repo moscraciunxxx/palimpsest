@@ -12,6 +12,9 @@ import {
 } from "./filters";
 import { detectLines, extractRegions } from "./layout";
 import { fromGray, mean, percentile, toGray, variance } from "./pixels";
+import { estimateRelief, rake } from "./raking";
+import { sentinelMap } from "./sentinel";
+import { splitInks } from "./spectra";
 import type { LayerId, PipelineResult } from "./types";
 
 export async function runPipeline(source: ImageData): Promise<PipelineResult> {
@@ -40,6 +43,10 @@ export async function runPipeline(source: ImageData): Promise<PipelineResult> {
   const binaryImg = fromGray(binary, w, h);
   const lacunaImg = lacunaVisualization(holes, w0, h0);
   const restored = restore(source, sharp, inkAligned, lacunaRot);
+  const relief = estimateRelief(sharp, w, h);
+  const rakingImg = rake(sharp, relief, w, h, 40, 28);
+  const spectra = splitInks(source);
+  const sentinel = sentinelMap(sharp, w, h);
 
   const lacunae = extractRegions(
     holes.combined,
@@ -70,6 +77,13 @@ export async function runPipeline(source: ImageData): Promise<PipelineResult> {
   } else {
     notes.push("No severe lacunae. Transcription can proceed with ordinary caution.");
   }
+  notes.push(
+    `Spectral mass — iron-gall ${(spectra.ironGall * 100).toFixed(0)}%, carbon ${(spectra.carbon * 100).toFixed(0)}%, later ${(spectra.later * 100).toFixed(0)}%. Undertext is chemistry, not a critical edition.`,
+  );
+  notes.push(
+    `Sentinel refused ${(sentinel.refuse * 100).toFixed(0)}% of dark patches as not-letters (structure tensor, unsupervised).`,
+  );
+  notes.push("Raking lamp is live: drag the brass to move the sun. Folds stand up. Nothing is written.");
 
   const layers: Record<LayerId, ImageData> = {
     original: source,
@@ -78,6 +92,10 @@ export async function runPipeline(source: ImageData): Promise<PipelineResult> {
     binary: binaryImg,
     lacuna: lacunaImg,
     restored,
+    raking: rakingImg,
+    undertext: spectra.undertext,
+    overtext: spectra.overtext,
+    sentinel: sentinel.image,
   };
 
   return {
@@ -94,8 +112,13 @@ export async function runPipeline(source: ImageData): Promise<PipelineResult> {
       meanInk,
       paperVariance: variance(lit),
       elapsedMs: performance.now() - t0,
+      ironGall: spectra.ironGall,
+      carbonInk: spectra.carbon,
+      laterInk: spectra.later,
+      sentinelRefuse: sentinel.refuse,
     },
     notes,
+    relief,
   };
 }
 

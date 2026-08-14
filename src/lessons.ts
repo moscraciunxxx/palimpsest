@@ -85,10 +85,42 @@ export const LESSONS: Lesson[] = [
     id: "leaves",
     numeral: "VIII",
     title: "Teaching leaf vs field leaf",
-    lede: "The five cases are instruments. Your photograph is the work.",
+    lede: "The six cases are instruments. Your photograph is the work.",
     body: [
-      "Kerala, Amina, Gulu, Beira, and Nana’s cake are generated in this browser so you can see the ethic before you risk a real page. They are not recovered archives. A banner says so.",
+      "Kerala, Amina, Gulu, Beira, Nana’s cake, and the scraped psalter are generated in this browser so you can see the ethic before you risk a real page. They are not recovered archives. A banner says so.",
       "A field leaf — a phone photo you bring — is first-class. A second photograph is a dual witness: only agreeing ink is trusted. Disagreement is a hole, not a vote.",
+    ],
+  },
+  {
+    id: "raking",
+    numeral: "IX",
+    title: "Raking the leaf",
+    lede: "A fold is a mountain until you move the sun.",
+    body: [
+      "Photogrammetry of paper. Relief from local contrast. Lambertian relight. Museums call a richer version RTI.",
+      "We do it in the browser so a tear stands up. The lamp does not write.",
+    ],
+    formula: "I = ka + kd max(0, N·L)",
+  },
+  {
+    id: "undertext",
+    numeral: "X",
+    title: "Two inks, one leaf",
+    lede: "Palimpsest is a chemistry problem before it is a language problem.",
+    body: [
+      "Faded undertext is mid-tone. If we wait for darkness, the older hand is classified as paper. We estimate the paper, then ask which residual is cool and which is warm.",
+      "Completing the scraped psalm is a second forgery. The undertext layer is a hypothesis about wavelength, not a critical edition. Three RGB channels stand in for a MSI camera.",
+    ],
+    formula: "iron ∝ max(0, (paper_R − R) − (paper_G − G))",
+  },
+  {
+    id: "sentinel",
+    numeral: "XI",
+    title: "The sentinel",
+    lede: "A stain can be as dark as a letter and still not be one.",
+    body: [
+      "Structure tensors measure whether darkness has a stroke direction. Isotropic dark is refused. This is unsupervised. It never proposes a glyph.",
+      "That refusal is the only machine-learning move we allow near a deed.",
     ],
   },
 ];

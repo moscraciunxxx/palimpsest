@@ -74,7 +74,55 @@ function paintText(ctx: CanvasRenderingContext2D, file: CaseFile, w: number, h: 
     carbon: { face: "13px 'IBM Plex Mono', monospace", size: 13, color: "rgba(58, 24, 88, 0.62)", leading: 20 },
     diploma: { face: "italic 18px 'Cormorant Garamond', serif", size: 18, color: "rgba(28, 20, 12, 0.9)", leading: 25 },
     recipe: { face: "22px Caveat, cursive", size: 22, color: "rgba(40, 24, 12, 0.88)", leading: 27 },
+    psalter: { face: "italic 16px 'Cormorant Garamond', serif", size: 16, color: "rgba(42, 28, 16, 0.9)", leading: 22 },
   };
+
+  if (file.id === "scraped") {
+    const under = [
+      "Beatus vir qui non abiit",
+      "in consilio impiorum",
+      "et in via peccatorum non stetit",
+      "et in cathedra pestilentiae",
+      "sed in lege Domini voluntas eius",
+      "et in lege eius meditabitur",
+      "die ac nocte",
+      "et erit tamquam lignum",
+      "quod plantatum est",
+      "secus decursus aquarum",
+    ];
+    ctx.fillStyle = "rgba(28, 92, 78, 0.72)";
+    ctx.font = "italic 23px 'Cormorant Garamond', serif";
+    ctx.textBaseline = "top";
+    let uy = 72;
+    for (const line of under) {
+      ctx.fillText(line, 58 + (hash(uy) - 0.5) * 6, uy);
+      uy += 36;
+    }
+
+    ctx.fillStyle = "rgba(236, 224, 196, 0.1)";
+    ctx.fillRect(0, 0, w, h);
+    const scraped = ctx.getImageData(0, 0, w, h);
+    const sd = scraped.data;
+    for (let i = 0; i < sd.length; i += 4) {
+      const lift = 1.04 + hash(i) * 0.03;
+      sd[i] = clamp(sd[i] * lift);
+      sd[i + 1] = clamp(sd[i + 1] * (lift + 0.01));
+      sd[i + 2] = clamp(sd[i + 2] * (lift + 0.015));
+    }
+    ctx.putImageData(scraped, 0, 0);
+
+    ctx.fillStyle = "rgba(88, 18, 22, 0.9)";
+    ctx.font = "13px 'Special Elite', monospace";
+    ctx.textBaseline = "top";
+    let y = 64;
+    for (const line of lines) {
+      if (y > h - 70) break;
+      ctx.fillText(line, 56, y);
+      y += 20;
+    }
+    return;
+  }
+
   const f = fonts[file.font];
   ctx.fillStyle = f.color;
   ctx.font = f.face;
@@ -126,6 +174,17 @@ function distress(ctx: CanvasRenderingContext2D, w: number, h: number, file: Cas
     bloom(ctx, 480, 520, 140, "rgba(160, 110, 40, 0.28)");
     bloom(ctx, 140, 780, 120, "rgba(120, 80, 30, 0.22)");
   }
+  if (file.id === "scraped") {
+    scrapeSheen(ctx, w, h);
+    fold(ctx, w, h);
+    crease(ctx, w, h, 0.22, 0.08);
+    crease(ctx, w, h, 0.78, -0.06);
+    cockle(ctx, w, h);
+    bloom(ctx, 150, 860, 120, "rgba(80, 58, 32, 0.3)");
+    bloom(ctx, 520, 240, 90, "rgba(70, 48, 28, 0.2)");
+    tide(ctx, w, h, 0.72);
+    scrapePatch(ctx, 420, 310, 130, 90);
+  }
 
   // Global fade + slight rotation to give the pipeline real work.
   const img = ctx.getImageData(0, 0, w, h);
@@ -163,6 +222,46 @@ function tide(ctx: CanvasRenderingContext2D, w: number, h: number, at: number) {
   ctx.fill();
 }
 
+function crease(ctx: CanvasRenderingContext2D, w: number, h: number, at: number, lean: number) {
+  ctx.strokeStyle = "rgba(36, 24, 14, 0.2)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(w * at, 0);
+  ctx.lineTo(w * (at + lean), h);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255, 244, 214, 0.16)";
+  ctx.beginPath();
+  ctx.moveTo(w * at + 3, 0);
+  ctx.lineTo(w * (at + lean) + 3, h);
+  ctx.stroke();
+  ctx.lineWidth = 1;
+}
+
+function cockle(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const x = (i / 4) % w;
+    const y = Math.floor(i / 4 / w);
+    const wave =
+      Math.sin(x / 17) * Math.sin(y / 21) * 10 +
+      Math.sin((x + y) / 13) * 6 +
+      Math.sin(x / 7 + y / 19) * 4;
+    d[i] = clamp(d[i] + wave);
+    d[i + 1] = clamp(d[i + 1] + wave * 0.92);
+    d[i + 2] = clamp(d[i + 2] + wave * 0.78);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function scrapePatch(ctx: CanvasRenderingContext2D, x: number, y: number, rw: number, rh: number) {
+  const g = ctx.createRadialGradient(x, y, 8, x, y, Math.max(rw, rh));
+  g.addColorStop(0, "rgba(244, 232, 204, 0.42)");
+  g.addColorStop(1, "rgba(244, 232, 204, 0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(x - rw, y - rh, rw * 2, rh * 2);
+}
+
 function fold(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.strokeStyle = "rgba(40, 28, 16, 0.22)";
   ctx.lineWidth = 2;
@@ -193,6 +292,17 @@ function fox(ctx: CanvasRenderingContext2D, w: number, h: number, n: number) {
 function fadeBand(ctx: CanvasRenderingContext2D, w: number, h: number, y0: number, y1: number) {
   ctx.fillStyle = "rgba(232, 214, 180, 0.35)";
   ctx.fillRect(0, h * y0, w, h * (y1 - y0));
+}
+
+function scrapeSheen(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const g = ctx.createLinearGradient(0, h * 0.12, w, h * 0.88);
+  g.addColorStop(0, "rgba(255, 248, 230, 0)");
+  g.addColorStop(0.38, "rgba(255, 248, 230, 0)");
+  g.addColorStop(0.48, "rgba(255, 250, 238, 0.26)");
+  g.addColorStop(0.58, "rgba(255, 248, 230, 0)");
+  g.addColorStop(1, "rgba(255, 248, 230, 0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
 }
 
 function glare(ctx: CanvasRenderingContext2D, w: number, _h: number) {

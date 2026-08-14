@@ -51,6 +51,30 @@ export function downloadDossier(
     `- Lacuna area: ${(result.metrics.lacunaArea * 100).toFixed(1)}%`,
     `- Pipeline: ${result.metrics.elapsedMs.toFixed(0)} ms, on-device`,
     ``,
+    ...(typeof result.metrics?.ironGall === "number" ||
+    typeof result.metrics?.carbonInk === "number" ||
+    typeof result.metrics?.laterInk === "number"
+      ? [
+          `## Spectral mass`,
+          ...(typeof result.metrics?.ironGall === "number"
+            ? [`- Iron-gall: ${(result.metrics.ironGall * 100).toFixed(1)}%`]
+            : []),
+          ...(typeof result.metrics?.carbonInk === "number"
+            ? [`- Carbon ink: ${(result.metrics.carbonInk * 100).toFixed(1)}%`]
+            : []),
+          ...(typeof result.metrics?.laterInk === "number"
+            ? [`- Later ink: ${(result.metrics.laterInk * 100).toFixed(1)}%`]
+            : []),
+          ``,
+        ]
+      : []),
+    ...(typeof result.metrics?.sentinelRefuse === "number"
+      ? [
+          `## Sentinel`,
+          `- Refused ${(result.metrics.sentinelRefuse * 100).toFixed(1)}% of dark patches — not letters`,
+          ``,
+        ]
+      : []),
     `## Method notes`,
     ...result.notes.map((n) => `- ${n}`),
     ``,

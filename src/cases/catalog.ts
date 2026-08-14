@@ -1,8 +1,8 @@
 import type { ForgerySpan } from "../engine/types";
 
-export type CaseId = "kerala" | "amina" | "clinic" | "idai" | "recipe" | "field";
+export type CaseId = "kerala" | "amina" | "clinic" | "idai" | "recipe" | "scraped" | "field";
 export type LeafOrigin = "teaching" | "field";
-export type Workflow = "tenure" | "care" | "memory" | "credential" | "inheritance";
+export type Workflow = "tenure" | "care" | "memory" | "credential" | "inheritance" | "heritage";
 
 export interface CaseFile {
   id: CaseId;
@@ -16,7 +16,7 @@ export interface CaseFile {
   story: string;
   impact: string;
   groundTruth: string;
-  font: "deed" | "hand" | "carbon" | "diploma" | "recipe";
+  font: "deed" | "hand" | "carbon" | "diploma" | "recipe" | "psalter";
   forgeries: ForgerySpan[];
 }
 
@@ -28,6 +28,8 @@ export const WORKFLOW_NEXT: Record<Workflow, string> = {
   credential:
     "The issuing school or ministry must reissue. This packet is a draft of what remains on the paper.",
   inheritance: "Taste is not a legal fact. The hole stays a hole.",
+  heritage:
+    "A paleographer or the holding archive must confirm the undertext. Palimpsest only separates chemistry, it does not name the scraped hand.",
 };
 
 export function fieldLeaf(name: string): CaseFile {
@@ -43,7 +45,7 @@ export function fieldLeaf(name: string): CaseFile {
     story:
       "This leaf entered the scriptorium from your camera, not from the teaching press. Palimpsest will lift what ink remains and refuse the rest. It will not invent a survey number, a dose, or a name.",
     impact:
-      "A field leaf is first-class. The five staged cases exist only to teach the ethic. Your photograph is the work. Nothing left this machine.",
+      "A field leaf is first-class. The six staged cases exist only to teach the ethic. Your photograph is the work. Nothing left this machine.",
     groundTruth: "",
     font: "deed",
     forgeries: [],
@@ -291,6 +293,51 @@ blue bowl. Same bowl. Same order.`,
         invented: "Mrs. Rao may have a copy",
         hole: "aside",
         risk: "Gossip written into a stain.",
+      },
+    ],
+  },
+  {
+    id: "scraped",
+    origin: "teaching",
+    workflow: "heritage",
+    shelf: "06 — Palimpsest",
+    title: "Scraped psalter, reused",
+    year: "c. 1180 / overwritten 2018",
+    place: "A leaf that survived by becoming a register",
+    damage: "Two inks. One scrape. The later hand is a flood register.",
+    story:
+      "The namesake. A psalter leaf was scraped and reused as a 2018 Kerala relief register. The older iron-gall is still in the paper. Palimpsest does not complete the psalm. It only asks which chemistry is which.",
+    impact:
+      "Palimpsest the word means a scraped book. Most 'AI recovery' would mash both hands into one fluent paragraph. That is two forgeries at once.",
+    groundTruth: `RELIEF REGISTER
+Ward VII, Kainakary
+19 August 2018
+
+Name                    Rice kg
+RAMAN PILLAI                 12
+ANJALI PILLAI                 8
+FATIMA BEEVI                 10
+S. MATHEW                     6
+THOMAS JOSEPH                14
+LEELA KUMARI                  9
+JOSEPH CHACKO                 7
+MARYKUTTY                    11
+
+Counted at the panchayat hall.
+Wet ink. No second issue today.
+Boats still at the bund.
+Rice from the school godown.`,
+    font: "psalter",
+    forgeries: [
+      {
+        invented: "Beatus vir qui non abiit in consilio",
+        hole: "undertext",
+        risk: "Completing a psalm from a stain.",
+      },
+      {
+        invented: "RR-2018-4401",
+        hole: "ration serial",
+        risk: "A serial no ledger issued.",
       },
     ],
   },

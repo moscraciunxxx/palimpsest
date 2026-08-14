@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { featherlessArchivist, localArchivist, type ArchivistTurn } from "./ai/archivist";
 import { forgeEdition } from "./ai/forger";
-import { CASES, fieldLeaf, type CaseFile } from "./cases/catalog";
+import { CASES, caseById, fieldLeaf, type CaseFile } from "./cases/catalog";
 import { renderCase } from "./cases/render";
+import { BenchBook } from "./components/BenchBook";
 import { Filmstrip, LABELS } from "./components/Filmstrip";
 import { LightTable } from "./components/LightTable";
 import { Prologue } from "./components/Prologue";
@@ -17,7 +18,9 @@ type Tab = "story" | "read" | "forge" | "talk";
 
 export default function App() {
   const [phase, setPhase] = useState<"prologue" | "studio">("prologue");
-  const [active, setActive] = useState<CaseFile | null>(CASES[0]);
+  const [active, setActive] = useState<CaseFile | null>(() => caseById("scraped") ?? CASES[0]);
+  const [azimuth, setAzimuth] = useState(40);
+  const [elevation, setElevation] = useState(28);
   const [fromArchive, setFromArchive] = useState(true);
   const [sourceImg, setSourceImg] = useState<ImageData | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -57,7 +60,8 @@ export default function App() {
     setResult(out);
     setActive(file);
     setFromArchive(file?.origin === "teaching");
-    setLayer("restored");
+    setLayer(file?.id === "scraped" ? "undertext" : "restored");
+    if (file?.id === "scraped") setCompare(0.64);
     setBusy(false);
     if (file?.origin === "teaching" && file.groundTruth) {
       const d = assistFromGroundTruth(file.groundTruth, out);
@@ -71,7 +75,8 @@ export default function App() {
 
   useEffect(() => {
     if (phase !== "studio" || result) return;
-    void process(renderCase(CASES[0]), CASES[0], null);
+    const first = caseById("scraped") ?? CASES[0];
+    void process(renderCase(first), first, null);
   }, [phase, result, process]);
 
   const openCase = (file: CaseFile) => {
@@ -148,9 +153,10 @@ export default function App() {
   const prompts = useMemo(
     () => [
       "What did the water take?",
-      "Show me the forger.",
-      "May I trust the names?",
-      "What is a teaching leaf?",
+      "Rake the leaf.",
+      "Show me the undertext.",
+      "What is the sentinel?",
+      "Probe the two inks.",
     ],
     [],
   );
@@ -171,6 +177,7 @@ export default function App() {
           <span>contrast <em>{m ? `${m.contrastGain.toFixed(2)}×` : "—"}</em></span>
           <span>readable <em>{m ? `${(m.readableArea * 100).toFixed(0)}%` : "—"}</em></span>
           <span>lacunae <em>{result ? result.lacunae.length : "—"}</em></span>
+          <span>iron <em>{m ? `${(m.ironGall * 100).toFixed(0)}%` : "—"}</em></span>
         </div>
         <div className="top-actions">
           <button className="tiny" onClick={() => setOverlay((v) => !v)}>
@@ -223,7 +230,7 @@ export default function App() {
             <h2>Light table</h2>
             <p>
               {active
-                ? `${active.damage}. Drag the brass rule to compare the witness with the working layer.`
+                ? `${active.damage}. Drag the brass rule. Open Raking and move the lamp. Undertext is chemistry, not a psalm.`
                 : "Choose a case file."}
               {witnessNote ? ` ${witnessNote}` : ""}
             </p>
@@ -243,6 +250,12 @@ export default function App() {
           onCompare={setCompare}
           showOverlay={overlay}
           busy={busy}
+          azimuth={azimuth}
+          elevation={elevation}
+          onLamp={(az, el) => {
+            setAzimuth(az);
+            setElevation(el);
+          }}
         />
         {result ? <Filmstrip result={result} layer={layer} onPick={setLayer} /> : <div className="film" />}
       </main>
@@ -260,7 +273,7 @@ export default function App() {
             <div className={`honesty ${active.origin}`}>
               {active.origin === "teaching"
                 ? "Teaching leaf — generated in this browser to demonstrate the ethic. Not a recovered archive."
-                : "Field leaf — your photograph. First-class. The five staged cases exist only to teach."}
+                : "Field leaf — your photograph. First-class. The six staged cases exist only to teach."}
             </div>
             <div className="kicker">{active.year}</div>
             <h3>{active.title}</h3>
@@ -273,11 +286,14 @@ export default function App() {
               <i>{active.origin}</i>
             </div>
             {result && (
-              <ol className="notes">
-                {result.notes.map((n) => (
-                  <li key={n}>{n}</li>
-                ))}
-              </ol>
+              <>
+                <BenchBook result={result} />
+                <ol className="notes">
+                  {result.notes.map((n) => (
+                    <li key={n}>{n}</li>
+                  ))}
+                </ol>
+              </>
             )}
           </div>
         )}

@@ -40,12 +40,16 @@ It runs a classical-and-unsupervised vision bench on-device:
 7. **Optional Tesseract.js** on the binary layer, and an archivist who is forbidden from inventing missing ink.
 8. **Optional Featherless** (sponsor open-weight API) if you want the archivist to speak with a larger model. The bench never needs a key.
 
-An eight-lesson studio sits under **Lessons**: why paper dies, why we divide instead of subtract, why a hole must remain a hole, why the forger is shown and never filed, and why a teaching leaf is not an archive. The instrument is also a classroom — aligned with the ML Empowerment Foundation’s reason for existing.
+An eleven-lesson studio sits under **Lessons**: why paper dies, why we divide instead of subtract, why a hole must remain a hole, why the forger is shown and never filed, and why a teaching leaf is not an archive. The instrument is also a classroom — aligned with the ML Empowerment Foundation’s reason for existing.
 
 ## Key features
 
 - **Light table** with a brass compare rule: witness versus any working layer.
-- **Five teaching leaves**, generated at runtime and labeled as instruments, not recovered archives: a Kerala settlement deed, a 1948 family letter, a Ugandan clinic carbon, a Beira school certificate, a stained recipe card.
+- **Six teaching leaves**, including a true palimpsest: a scraped psalter overwritten as a 2018 relief register. Two inks. One leaf. Neither invented.
+- **Raking lamp** — drag the brass sun; folds stand up (RTI-lite, on-device).
+- **Undertext / later hand** — paper-relative unmixing. Faded iron-gall is mid-tone; we do not wait for darkness. Chemistry, not a critical edition.
+- **Spectrometer probe** — click the leaf. Iron, carbon, and later ink at that point.
+- **Sentinel** — structure tensors refuse isotropic stains as letters. Unsupervised. No glyphs proposed.
 - **Field leaf** — a photograph you bring is first-class, not a demo afterthought.
 - **Forger’s table** — a labeled FORGERY / NOT EVIDENCE column showing what a completing model would invent. Never the restored product.
 - **Uncertainty-aware reading** — Tesseract word confidence; below the wick the word becomes a hole. Entities are taken only from spoken ink.
@@ -68,6 +72,9 @@ An eight-lesson studio sits under **Lessons**: why paper dies, why we divide ins
 | Interface | React 19 + TypeScript + Vite | Immediate, inspectable, deployable |
 | Geometry | Projection profiles, bilinear resample | Deskew without a neural net |
 | Photometry | Homomorphic division, Beer–Lambert OD | Physics before labels |
+| Spectra | Paper-relative RGB unmix (cool / warm / carbon) | Faded undertext is allowed to speak |
+| Relief | Structure from local contrast + Lambertian rake | A fold is a mountain until you move the sun |
+| Sentinel | Structure tensor, unsupervised | A stain is not a letter |
 | Binarisation | Sauvola + integral images | Linear-time adaptive threshold |
 | Layout | Projection + connected line bands | Confidence per line |
 | Reading | Tesseract.js (in-browser LSTM OCR) | Real OCR, optional |

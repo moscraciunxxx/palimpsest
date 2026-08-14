@@ -4,7 +4,11 @@ export type LayerId =
   | "ink"
   | "binary"
   | "lacuna"
-  | "restored";
+  | "restored"
+  | "raking"
+  | "undertext"
+  | "overtext"
+  | "sentinel";
 
 export type DamageKind = "stain" | "wash" | "tear" | "mold" | "fold";
 
@@ -36,6 +40,10 @@ export interface PipelineMetrics {
   meanInk: number;
   paperVariance: number;
   elapsedMs: number;
+  ironGall: number;
+  carbonInk: number;
+  laterInk: number;
+  sentinelRefuse: number;
 }
 
 export interface PipelineResult {
@@ -46,6 +54,7 @@ export interface PipelineResult {
   lines: TextLine[];
   metrics: PipelineMetrics;
   notes: string[];
+  relief: Float32Array;
 }
 
 export interface Entity {

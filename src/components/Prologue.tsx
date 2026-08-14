@@ -14,11 +14,10 @@ export function Prologue({ onEnter }: Props) {
             <em>time tried to erase.</em>
           </h1>
           <p className="lede">
-            Palimpsest is first aid for paper. It runs a full computer-vision bench —
-            illumination correction, Beer–Lambert ink separation, Sauvola
-            thresholding, lacuna ethics — entirely in your browser, so a flood-stained
-            deed never has to visit a stranger’s server. A completing model is shown
-            on a forger’s table and never filed as the page.
+            Palimpsest is first aid for paper — a lamp, a leaf, and the patience to
+            read what water left behind, entirely in your browser. A language model
+            completing a survey number is a polite forger. We show that voice on a
+            table. We never file it as the page.
           </p>
           <div className="facts">
             <div>
@@ -33,12 +32,16 @@ export function Prologue({ onEnter }: Props) {
               <strong>0</strong>
               <span>invented letters. Holes stay holes. That is the product.</span>
             </div>
+            <div>
+              <strong>2</strong>
+              <span>hands on a scraped leaf. The instrument unmixes chemistry. It does not write a psalm.</span>
+            </div>
           </div>
           <div className="cta-row">
             <button className="btn" onClick={onEnter}>
               Enter the scriptorium
             </button>
-            <span className="fine">On-device · no account · five teaching leaves · bring a field photograph</span>
+            <span className="fine">On-device · no account · six teaching leaves · bring a field photograph</span>
           </div>
         </div>
         <p className="fine">
@@ -49,8 +52,8 @@ export function Prologue({ onEnter }: Props) {
       <aside className="prologue-leaf">
         <div className="grain" />
         <blockquote>
-          “A language model completing a survey number is a polite forger.”
-          <cite>The ethics of the hole · Lesson V</cite>
+          “Two hands. One leaf. Neither invented.”
+          <cite>The namesake · Lesson X</cite>
         </blockquote>
       </aside>
     </section>

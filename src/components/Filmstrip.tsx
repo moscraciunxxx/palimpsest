@@ -9,6 +9,10 @@ const LABELS: { id: LayerId; name: string }[] = [
   { id: "binary", name: "Sauvola" },
   { id: "lacuna", name: "Holes" },
   { id: "restored", name: "Restored" },
+  { id: "raking", name: "Raking" },
+  { id: "undertext", name: "Undertext" },
+  { id: "overtext", name: "Later hand" },
+  { id: "sentinel", name: "Sentinel" },
 ];
 
 export function Filmstrip({
@@ -22,16 +26,19 @@ export function Filmstrip({
 }) {
   return (
     <div className="film">
-      {LABELS.map((l) => (
-        <button
-          key={l.id}
-          className={`chip ${layer === l.id ? "on" : ""}`}
-          onClick={() => onPick(l.id)}
-        >
-          <Thumb img={result.layers[l.id]} />
-          <b>{l.name}</b>
-        </button>
-      ))}
+      {LABELS.map((l) => {
+        if (!result.layers[l.id]) return null;
+        return (
+          <button
+            key={l.id}
+            className={`chip ${layer === l.id ? "on" : ""}`}
+            onClick={() => onPick(l.id)}
+          >
+            <Thumb img={result.layers[l.id]} />
+            <b>{l.name}</b>
+          </button>
+        );
+      })}
     </div>
   );
 }

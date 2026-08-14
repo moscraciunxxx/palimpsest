@@ -19,6 +19,18 @@ export function localArchivist(
     return "Place a leaf on the light table first. I can only speak to ink I have seen.";
   }
 
+  if (/rake|raking|lamp|rti/.test(q)) {
+    return "A fold is a mountain until you move the sun. I estimate relief from local contrast and relight with a Lambertian lamp: I = ka + kd max(0, N·L). Museums call the richer version RTI. We do it here so a tear stands up. The lamp does not write letters.";
+  }
+
+  if (/undertext|palimpsest|unmix|scraped|psalm|probe|two inks|spectr/.test(q)) {
+    return "Palimpsest is chemistry before language. I estimate the paper, then ask which residual is cool (the older hand on this teaching leaf) and which is warm (the later register). Click the leaf: the probe reports iron, carbon, and later ink at that point. The undertext layer is a hypothesis about wavelength, not a critical edition. Completing a scraped psalm would be a second forgery — I will not invent the missing letters.";
+  }
+
+  if (/sentinel|stroke|tensor/.test(q)) {
+    return "A stain can be as dark as a letter and still not be one. Structure tensors ask whether darkness has a stroke direction. Isotropic dark is refused. This is unsupervised: I never propose a glyph. That refusal is the only machine-learning move I allow near a deed.";
+  }
+
   if (/lacuna|missing|gap|stain|damage|water|flood|took|take/.test(q)) {
     const kinds = tally(result.lacunae.map((l) => l.kind));
     return [
@@ -52,7 +64,7 @@ export function localArchivist(
   }
 
   if (/teaching|field leaf|generated|staged/.test(q)) {
-    return "The five archive cases are teaching leaves, pressed in this browser so the ethic is visible. They are not recovered documents. A photograph you bring is a field leaf, and it is first-class.";
+    return "The six archive cases are teaching leaves, pressed in this browser so the ethic is visible. They are not recovered documents. A photograph you bring is a field leaf, and it is first-class.";
   }
 
   if (/witness|second photo|dual/.test(q)) {

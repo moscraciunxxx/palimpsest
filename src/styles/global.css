@@ -79,7 +79,7 @@ button { cursor: pointer; }
 }
 .facts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 18px;
   max-width: 40rem;
   margin-bottom: 40px;
@@ -653,4 +653,168 @@ button { cursor: pointer; }
   .facts { grid-template-columns: 1fr; }
   .lesson-grid { grid-template-columns: 1fr; }
   .prologue-copy { padding: 36px 24px; }
+}
+
+.bench { max-width: 420px; padding: 20px 22px 22px; }
+.bench h3 { font-family: var(--serif); font-size: 24px; margin: 4px 0 14px; }
+.bench-readings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 0 0 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.bench-readings dt {
+  color: var(--fog);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bench-readings dd { margin: 2px 0 0; color: var(--brass); }
+.bench-spectral { margin: 4px 0 12px; }
+.bench-meter {
+  display: grid;
+  grid-template-columns: 88px 1fr 36px;
+  gap: 8px;
+  align-items: center;
+  margin: 7px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--vellum-dim);
+}
+.bench-meter em { font-style: normal; color: var(--brass); text-align: right; }
+.bench-track { display: block; height: 3px; background: rgba(201, 163, 106, 0.16); }
+.bench-fill { display: block; height: 3px; background: var(--brass); }
+.bench-ethic { color: var(--fog); font-size: 12px; font-style: italic; margin: 14px 0 0; }
+
+/* ——— Raking lamp / walnut well ——— */
+.viewport {
+  background-color: #080604;
+  box-shadow:
+    inset 0 0 120px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 14px rgba(16, 12, 8, 0.55),
+    inset 0 1px 0 rgba(201, 163, 106, 0.06);
+}
+.well {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow:
+    inset 0 0 28px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(26, 21, 16, 0.75),
+    0 18px 48px rgba(0, 0, 0, 0.4);
+  border-radius: 1px;
+}
+.lamp {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  padding: 0;
+  border: 1px solid var(--brass);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #f3e0b4, var(--brass) 42%, var(--brass-dim));
+  box-shadow:
+    0 0 18px rgba(201, 163, 106, 0.42),
+    0 4px 10px rgba(0, 0, 0, 0.55),
+    inset 0 2px 2px rgba(255, 236, 200, 0.55),
+    inset 0 -2px 3px rgba(80, 50, 16, 0.35);
+  cursor: grab;
+  z-index: 6;
+  touch-action: none;
+}
+.lamp.dragging,
+.lamp:active { cursor: grabbing; }
+.lamp:focus-visible {
+  outline: 1px solid var(--brass);
+  outline-offset: 3px;
+}
+.lamp-spoke {
+  position: absolute;
+  height: 1px;
+  margin-top: -0.5px;
+  background: linear-gradient(90deg, rgba(201, 163, 106, 0.28), transparent);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+.lamp-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: soft-light;
+}
+.lamp-height {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(16, 13, 10, 0.72);
+  border: 1px solid var(--line);
+}
+.lamp-height span {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-dim);
+}
+.lamp-height input {
+  width: 72px;
+  accent-color: var(--brass);
+}
+.probe {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+  transform: translate(10px, -28px);
+}
+.probe-pin {
+  position: absolute;
+  left: -12px;
+  top: 22px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 0 10px rgba(201, 163, 106, 0.7);
+}
+.probe-card {
+  min-width: 118px;
+  padding: 8px 10px 9px;
+  background: rgba(14, 11, 8, 0.88);
+  border: 1px solid var(--brass-dim);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  display: grid;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vellum-dim);
+}
+.probe-card b {
+  color: var(--brass);
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+.film {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.facts {
+  grid-template-columns: 1fr 1fr;
+  max-width: 40rem;
+}
+@media (max-width: 1100px) {
+  .facts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 860px) {
+  .facts { grid-template-columns: 1fr; }
 }
