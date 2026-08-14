@@ -6,6 +6,8 @@ Recover what time, water, and forgetting tried to erase — entirely in the brow
 
 **Live demo (no install):** https://moscraciunxxx.github.io/palimpsest/
 
+The demo is the production Vite build on GitHub Pages (`gh-pages` branch).
+
 ```
 npm install
 npm run dev
