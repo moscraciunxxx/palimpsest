@@ -28,19 +28,21 @@ Palimpsest is first aid for paper. It is a browser-native computer-vision bench 
 - reads optionally with Tesseract.js
 - speaks through an archivist who is forbidden from inventing ink
 
-Five case files — Kerala 2018, a 1948 letter, a Gulu clinic carbon, a Beira certificate after Cyclone Idai, a stained recipe — are generated at runtime so judges can see damage and recovery, not a mockup. Students can also open the **Lessons** studio and learn why each algorithm exists. Optional Featherless (hackathon sponsor) gives the archivist an open-weight voice. The bench never needs a key, and the document never needs a server.
+Five **teaching leaves** — Kerala 2018, a 1948 letter, a Gulu clinic carbon, a Beira certificate after Cyclone Idai, a stained recipe — are generated at runtime and labeled as instruments, not recovered archives. A photograph you bring is a first-class **field leaf**. The **forge** tab shows what a completing model would invent, stamped FORGERY — NOT EVIDENCE, and never files it as the page. Students can open the **Lessons** studio (eight leaves) and learn why each algorithm exists. Optional Featherless (hackathon sponsor) gives the archivist an open-weight voice. The bench never needs a key, and the document never needs a server.
 
 ## Key features
 
 - Light table with brass compare rule (witness vs. any working layer)
 - Six-stage visible pipeline: witness, lamp-out, density, Sauvola, holes, restored
 - Lacuna overlays and per-line confidence
-- In-browser OCR (Tesseract.js) and diplomatic “witness” reading
-- Provisional entity extraction (person, place, date, identifier)
+- In-browser OCR (Tesseract.js) with word-level confidence; low-confidence words become holes
+- Entities extracted only from spoken ink
+- Forger vs diplomat split view (labeled, never evidence)
+- Dual-witness: second photograph; only agreeing ink is trusted
+- First-aid / chain-of-custody packet (seen vs inferred, next human action)
 - Evidence-bound archivist; optional Featherless Llama 3.1
-- Local export of a markdown dossier + restored PNG
-- Six-lesson computational paleography studio
-- Bring-your-own photograph, processed on-device
+- Eight-lesson computational paleography studio
+- Field photograph, processed on-device and treated as first-class
 
 ## Technologies used
 
@@ -70,4 +72,4 @@ npm install
 npm run dev
 ```
 
-Enter the scriptorium → open **01 — Tenure** → drag the brass rule → **Read** → **Lessons**.
+Enter the scriptorium → open **01 — Tenure** → drag the brass rule → **Read** → **Forge** (the oxblood column is not the page) → **Lessons**.

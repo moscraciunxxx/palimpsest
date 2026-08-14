@@ -71,4 +71,24 @@ export const LESSONS: Lesson[] = [
       "Palimpsest runs entirely in your browser so a clinic carbon or a land deed never has to visit a stranger’s server. Optional Featherless speech is a scholar in the room, not a vault in the cloud.",
     ],
   },
+  {
+    id: "forger",
+    numeral: "VII",
+    title: "The forger in the room",
+    lede: "Show the completing model. Never file it.",
+    body: [
+      "Most ‘AI document recovery’ products do one extra step: they write letters into the stain. Palimpsest keeps that step, but only as a labeled warning. The forge tab is a forger’s table — Survey No. 218/1, a raised mark, a dose that may never have happened.",
+      "The diplomatic edition and the first-aid packet never absorb those words. If a judge cannot tell the two columns apart, the product has failed.",
+    ],
+  },
+  {
+    id: "leaves",
+    numeral: "VIII",
+    title: "Teaching leaf vs field leaf",
+    lede: "The five cases are instruments. Your photograph is the work.",
+    body: [
+      "Kerala, Amina, Gulu, Beira, and Nana’s cake are generated in this browser so you can see the ethic before you risk a real page. They are not recovered archives. A banner says so.",
+      "A field leaf — a phone photo you bring — is first-class. A second photograph is a dual witness: only agreeing ink is trusted. Disagreement is a hole, not a vote.",
+    ],
+  },
 ];

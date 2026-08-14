@@ -1,6 +1,8 @@
 import { createWorker } from "tesseract.js";
 import { imageToCanvas } from "../engine/pixels";
-import type { Dossier, Entity, PipelineResult } from "../engine/types";
+import type { Dossier, Entity, PipelineResult, WordReading } from "../engine/types";
+
+const SPEAK_THRESHOLD = 62;
 
 let workerPromise: ReturnType<typeof createWorker> | null = null;
 
@@ -13,32 +15,48 @@ async function worker() {
   return workerPromise;
 }
 
+type TessWord = { text?: string; confidence?: number };
+
 export async function transcribe(
   result: PipelineResult,
   onProgress?: (p: number) => void,
 ): Promise<Dossier> {
   const canvas = imageToCanvas(result.layers.binary);
   const w = await worker();
-  const { data } = await w.recognize(canvas, {}, { text: true });
+  const { data } = await w.recognize(canvas);
   onProgress?.(1);
   const raw = (data.text || "").replace(/\u000c/g, "").trim();
-  return buildDossier(raw, result, "tesseract");
+  const words: WordReading[] = ((data as { words?: TessWord[] }).words ?? [])
+    .map((word) => {
+      const text = (word.text || "").trim();
+      const confidence = Number(word.confidence ?? 0);
+      return { text, confidence, spoken: text.length > 0 && confidence >= SPEAK_THRESHOLD };
+    })
+    .filter((word) => word.text.length > 0);
+  return buildDossier(raw, result, "tesseract", words);
 }
 
 export function buildDossier(
   raw: string,
   result: PipelineResult,
   source: Dossier["source"],
+  words: WordReading[] = [],
 ): Dossier {
-  const lines = raw.split(/\n+/).map((l) => l.trim()).filter(Boolean);
-  const diplomatic = lines
-    .map((line, i) => {
-      const layout = result.lines[i];
-      const mark = layout && layout.confidence < 0.45 ? "  †" : "";
-      const hole = layout && layout.lacunaOverlap > 0.22 ? "  ⟦lacuna⟧" : "";
-      return `${line}${mark}${hole}`;
-    })
-    .join("\n");
+  const spokenOnly = words.length
+    ? words.map((w) => (w.spoken ? w.text : "⟦…⟧")).join(" ")
+    : spokenFromLines(raw, result);
+
+  const diplomatic = words.length
+    ? spokenOnly
+    : lines
+        .from(raw)
+        .map((line, i) => {
+          const layout = result.lines[i];
+          const mark = layout && layout.confidence < 0.45 ? "  †" : "";
+          const hole = layout && layout.lacunaOverlap > 0.22 ? "  ⟦lacuna⟧" : "";
+          return `${line}${mark}${hole}`;
+        })
+        .join("\n");
 
   const inferredSpans = result.lacunae.slice(0, 6).map((l) => ({
     text: `〈${l.kind} ${Math.round(l.severity * 100)}%〉`,
@@ -53,16 +71,39 @@ export function buildDossier(
       : "— Editorial note —\nNo severe lacunae. Still treat OCR as a draft.",
   ].join("\n");
 
+  const entitySource = words.length
+    ? words.filter((w) => w.spoken).map((w) => w.text).join(" ")
+    : spokenOnly.replace(/⟦…⟧/g, " ").replace(/\[\u2026\]/g, " ");
+
   return {
     rawText: raw,
     diplomatic,
+    spokenOnly,
+    words,
     reconstruction,
     inferredSpans,
-    entities: extractEntities(raw),
+    entities: extractEntities(entitySource),
     caution:
-      "Palimpsest distinguishes seen ink from inferred meaning. Anything in 〈angle brackets〉 or marked † is uncertain.",
+      "Palimpsest distinguishes seen ink from inferred meaning. Words below the confidence wick become holes. Anything in 〈angle brackets〉 or marked † is uncertain. Entities are taken only from spoken ink.",
     source,
   };
+}
+
+const lines = {
+  from(raw: string) {
+    return raw.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  },
+};
+
+function spokenFromLines(raw: string, result: PipelineResult): string {
+  return lines
+    .from(raw)
+    .map((line, i) => {
+      const layout = result.lines[i];
+      if (layout && (layout.confidence < 0.45 || layout.lacunaOverlap > 0.22)) return "⟦…⟧";
+      return line;
+    })
+    .join("\n");
 }
 
 export function extractEntities(text: string): Entity[] {
@@ -108,8 +149,8 @@ export function assistFromGroundTruth(truth: string, result: PipelineResult): Do
 }
 
 function degradeTruth(truth: string, result: PipelineResult): string {
-  const lines = truth.split("\n");
-  return lines
+  const rows = truth.split("\n");
+  return rows
     .map((line, i) => {
       const layout = result.lines[i];
       if (!layout) return line;

@@ -1,7 +1,13 @@
-export type CaseId = "kerala" | "amina" | "clinic" | "idai" | "recipe";
+import type { ForgerySpan } from "../engine/types";
+
+export type CaseId = "kerala" | "amina" | "clinic" | "idai" | "recipe" | "field";
+export type LeafOrigin = "teaching" | "field";
+export type Workflow = "tenure" | "care" | "memory" | "credential" | "inheritance";
 
 export interface CaseFile {
   id: CaseId;
+  origin: LeafOrigin;
+  workflow: Workflow;
   shelf: string;
   title: string;
   year: string;
@@ -11,11 +17,44 @@ export interface CaseFile {
   impact: string;
   groundTruth: string;
   font: "deed" | "hand" | "carbon" | "diploma" | "recipe";
+  forgeries: ForgerySpan[];
+}
+
+export const WORKFLOW_NEXT: Record<Workflow, string> = {
+  tenure:
+    "A registrar must compare this packet to a second registered copy. Palimpsest is first aid, not a title.",
+  care: "A clinician must confirm the series from a parent-held card or the register book. Do not vaccinate from a guess.",
+  memory: "A living witness who knew the hand is the second reader. The hole is not a biography.",
+  credential:
+    "The issuing school or ministry must reissue. This packet is a draft of what remains on the paper.",
+  inheritance: "Taste is not a legal fact. The hole stays a hole.",
+};
+
+export function fieldLeaf(name: string): CaseFile {
+  return {
+    id: "field",
+    origin: "field",
+    workflow: "tenure",
+    shelf: "00 — Field",
+    title: name.replace(/\.[^.]+$/, "") || "Untitled leaf",
+    year: new Date().toISOString().slice(0, 10),
+    place: "Your table",
+    damage: "Unknown — the instrument will only hypothesise from light",
+    story:
+      "This leaf entered the scriptorium from your camera, not from the teaching press. Palimpsest will lift what ink remains and refuse the rest. It will not invent a survey number, a dose, or a name.",
+    impact:
+      "A field leaf is first-class. The five staged cases exist only to teach the ethic. Your photograph is the work. Nothing left this machine.",
+    groundTruth: "",
+    font: "deed",
+    forgeries: [],
+  };
 }
 
 export const CASES: CaseFile[] = [
   {
     id: "kerala",
+    origin: "teaching",
+    workflow: "tenure",
     shelf: "01 — Tenure",
     title: "Settlement Deed, Alappuzha",
     year: "2009 / recovered 2018",
@@ -50,9 +89,28 @@ Witnesses:
 
 Registered this day under the Registration Act, 1908.`,
     font: "deed",
+    forgeries: [
+      {
+        invented: "Survey No. 218/1",
+        hole: "survey parcel",
+        risk: "Wrong parcel — a forged boundary.",
+      },
+      {
+        invented: "48 cents",
+        hole: "area",
+        risk: "An inflated holding sold as recovered ink.",
+      },
+      {
+        invented: "ANJALI MENON",
+        hole: "beneficiary",
+        risk: "A substituted heir.",
+      },
+    ],
   },
   {
     id: "amina",
+    origin: "teaching",
+    workflow: "memory",
     shelf: "02 — Memory",
     title: "Letter from Amina",
     year: "October 1948",
@@ -80,9 +138,23 @@ Yours, in the old house still,
 Amina
 12 October 1948`,
     font: "hand",
+    forgeries: [
+      {
+        invented: "the blue key under the third stair",
+        hole: "instruction",
+        risk: "A completed memory that was never written.",
+      },
+      {
+        invented: "we leave on Thursday",
+        hole: "date of flight",
+        risk: "A schedule invented from a stain.",
+      },
+    ],
   },
   {
     id: "clinic",
+    origin: "teaching",
+    workflow: "care",
     shelf: "03 — Care",
     title: "Rural clinic carbon copy",
     year: "2023",
@@ -113,9 +185,23 @@ Weight at last visit: 9.4 kg
 Next appointment: 12 / 08 / 2023
 Notes: no adverse event. advise ORS + zinc if diarrhoea.`,
     font: "carbon",
+    forgeries: [
+      {
+        invented: "Penta 3 17/06/2022",
+        hole: "third dose",
+        risk: "A dose that may never have happened.",
+      },
+      {
+        invented: "OKELLO DAVID",
+        hole: "child name",
+        risk: "Wrong child, same village.",
+      },
+    ],
   },
   {
     id: "idai",
+    origin: "teaching",
+    workflow: "credential",
     shelf: "04 — Credential",
     title: "School certificate, Beira",
     year: "2016 / cyclone 2019",
@@ -146,9 +232,23 @@ Issued at Beira, 18 December 2016
 Headmaster: Joaquim T. Nhampossa
 No. 2016 / ESM / 0841`,
     font: "diploma",
+    forgeries: [
+      {
+        invented: "16 / 20  (Muito Bom)",
+        hole: "classification",
+        risk: "A raised mark that a ministry never issued.",
+      },
+      {
+        invented: "No. 2016 / ESM / 0912",
+        hole: "certificate number",
+        risk: "A serial that belongs to no ledger.",
+      },
+    ],
   },
   {
     id: "recipe",
+    origin: "teaching",
+    workflow: "inheritance",
     shelf: "05 — Inheritance",
     title: "Nana's cardamom cake",
     year: "c. 1974",
@@ -181,6 +281,18 @@ about 40 minutes, listen to the house.
 When Father was alive we used the
 blue bowl. Same bowl. Same order.`,
     font: "recipe",
+    forgeries: [
+      {
+        invented: "1 tsp baking soda",
+        hole: "leavener",
+        risk: "A substitution that ruins the cake and the memory.",
+      },
+      {
+        invented: "Mrs. Rao may have a copy",
+        hole: "aside",
+        risk: "Gossip written into a stain.",
+      },
+    ],
   },
 ];
 

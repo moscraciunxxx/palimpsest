@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { featherlessArchivist, localArchivist, type ArchivistTurn } from "./ai/archivist";
-import { CASES, type CaseFile } from "./cases/catalog";
+import { forgeEdition } from "./ai/forger";
+import { CASES, fieldLeaf, type CaseFile } from "./cases/catalog";
 import { renderCase } from "./cases/render";
 import { Filmstrip, LABELS } from "./components/Filmstrip";
 import { LightTable } from "./components/LightTable";
 import { Prologue } from "./components/Prologue";
 import { runPipeline } from "./engine/pipeline";
-import type { Dossier, LayerId, PipelineResult } from "./engine/types";
+import type { Dossier, ForgeryEdition, LayerId, PipelineResult } from "./engine/types";
+import { applyWitness } from "./engine/witness";
 import { LESSONS } from "./lessons";
 import { downloadDossier, loadUserImage } from "./lib/io";
 import { assistFromGroundTruth, transcribe } from "./ocr/transcribe";
 
-type Tab = "story" | "read" | "talk";
+type Tab = "story" | "read" | "forge" | "talk";
 
 export default function App() {
   const [phase, setPhase] = useState<"prologue" | "studio">("prologue");
   const [active, setActive] = useState<CaseFile | null>(CASES[0]);
   const [fromArchive, setFromArchive] = useState(true);
+  const [sourceImg, setSourceImg] = useState<ImageData | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [layer, setLayer] = useState<LayerId>("restored");
   const [compare, setCompare] = useState(0.56);
@@ -24,6 +27,7 @@ export default function App() {
   const [overlay, setOverlay] = useState(true);
   const [tab, setTab] = useState<Tab>("story");
   const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [forgery, setForgery] = useState<ForgeryEdition | null>(null);
   const [ocrBusy, setOcrBusy] = useState(false);
   const [chat, setChat] = useState<ArchivistTurn[]>([]);
   const [question, setQuestion] = useState("");
@@ -31,28 +35,47 @@ export default function App() {
   const [settings, setSettings] = useState(false);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("palimpsest.featherless") || "");
   const [status, setStatus] = useState("Ready.");
+  const [witnessNote, setWitnessNote] = useState("");
 
-  const process = useCallback(async (img: ImageData, file: CaseFile | null) => {
+  const process = useCallback(async (img: ImageData, file: CaseFile | null, second: ImageData | null = null) => {
     setBusy(true);
     setDossier(null);
+    setForgery(null);
     setStatus("Running the bench…");
     await new Promise((r) => requestAnimationFrame(() => r(null)));
-    const out = await runPipeline(img);
+    let out = await runPipeline(img);
+    if (second) {
+      const applied = applyWitness(out, second);
+      out = applied.result;
+      setWitnessNote(
+        `${(applied.report.agreeRatio * 100).toFixed(0)}% of ink agrees; dissent is a hole, not a vote.`,
+      );
+    } else {
+      setWitnessNote("");
+    }
+    setSourceImg(img);
     setResult(out);
     setActive(file);
-    setFromArchive(Boolean(file && CASES.some((c) => c.title === file.title)));
+    setFromArchive(file?.origin === "teaching");
     setLayer("restored");
     setBusy(false);
-    setStatus(`Recovered in ${out.metrics.elapsedMs.toFixed(0)} ms · on-device`);
+    if (file?.origin === "teaching" && file.groundTruth) {
+      const d = assistFromGroundTruth(file.groundTruth, out);
+      setDossier(d);
+      setForgery(forgeEdition(d.diplomatic, file));
+      setStatus(`Recovered in ${out.metrics.elapsedMs.toFixed(0)} ms · teaching leaf, holes left open`);
+    } else {
+      setStatus(`Recovered in ${out.metrics.elapsedMs.toFixed(0)} ms · on-device`);
+    }
   }, []);
 
   useEffect(() => {
     if (phase !== "studio" || result) return;
-    void process(renderCase(CASES[0]), CASES[0]);
+    void process(renderCase(CASES[0]), CASES[0], null);
   }, [phase, result, process]);
 
   const openCase = (file: CaseFile) => {
-    void process(renderCase(file), file);
+    void process(renderCase(file), file, null);
     setTab("story");
     setChat([]);
   };
@@ -61,19 +84,17 @@ export default function App() {
     const file = list?.[0];
     if (!file) return;
     const img = await loadUserImage(file);
-    await process(img, {
-      ...CASES[0],
-      id: "kerala",
-      shelf: "00 — Field",
-      title: file.name,
-      year: new Date().toISOString().slice(0, 10),
-      place: "Local capture",
-      damage: "Unknown — instrument will hypothesise",
-      story: "A leaf you brought to the table. The pipeline does not know its history; it only knows light.",
-      impact: "Your document never left this machine.",
-      groundTruth: "",
-      font: "deed",
-    });
+    await process(img, fieldLeaf(file.name), null);
+    setTab("story");
+    setChat([]);
+  };
+
+  const onWitness = async (list: FileList | null) => {
+    const file = list?.[0];
+    if (!file || !sourceImg) return;
+    const img = await loadUserImage(file);
+    await process(sourceImg, active, img);
+    setStatus((s) => `${s} · second witness applied`);
   };
 
   const readInk = async (mode: "ocr" | "assist") => {
@@ -82,13 +103,16 @@ export default function App() {
     setTab("read");
     try {
       if (mode === "assist" && active?.groundTruth) {
-        setDossier(assistFromGroundTruth(active.groundTruth, result));
+        const d = assistFromGroundTruth(active.groundTruth, result);
+        setDossier(d);
+        setForgery(forgeEdition(d.diplomatic, active));
         setStatus("Diplomatic reading from the case witness, damaged by measured lacunae.");
       } else {
         setStatus("Tesseract.js is looking at the Sauvola layer…");
         const d = await transcribe(result);
         setDossier(d);
-        setStatus("Ink read. Names remain hypotheses.");
+        setForgery(forgeEdition(d.diplomatic, active));
+        setStatus("Ink read. Names remain hypotheses. Low-confidence words are holes.");
       }
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "The reader stumbled.");
@@ -122,7 +146,12 @@ export default function App() {
 
   const m = result?.metrics;
   const prompts = useMemo(
-    () => ["What did the water take?", "Explain Sauvola.", "May I trust the names?", "Why deskew first?"],
+    () => [
+      "What did the water take?",
+      "Show me the forger.",
+      "May I trust the names?",
+      "What is a teaching leaf?",
+    ],
     [],
   );
 
@@ -173,10 +202,17 @@ export default function App() {
           </button>
         ))}
         <div className="upload">
-          Bring your own leaf.{" "}
+          Field leaf — first-class.{" "}
           <label>
             Open image
             <input type="file" accept="image/*" onChange={(e) => void onUpload(e.target.files)} />
+          </label>
+        </div>
+        <div className="upload">
+          Second witness — only agreeing ink is trusted.{" "}
+          <label>
+            Open witness
+            <input type="file" accept="image/*" onChange={(e) => void onWitness(e.target.files)} />
           </label>
         </div>
       </aside>
@@ -189,6 +225,7 @@ export default function App() {
               {active
                 ? `${active.damage}. Drag the brass rule to compare the witness with the working layer.`
                 : "Choose a case file."}
+              {witnessNote ? ` ${witnessNote}` : ""}
             </p>
           </div>
           <div className="layers">
@@ -212,7 +249,7 @@ export default function App() {
 
       <aside className="dossier">
         <div className="tabs">
-          {(["story", "read", "talk"] as Tab[]).map((t) => (
+          {(["story", "read", "forge", "talk"] as Tab[]).map((t) => (
             <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>
               {t}
             </button>
@@ -220,6 +257,11 @@ export default function App() {
         </div>
         {tab === "story" && active && (
           <div className="story">
+            <div className={`honesty ${active.origin}`}>
+              {active.origin === "teaching"
+                ? "Teaching leaf — generated in this browser to demonstrate the ethic. Not a recovered archive."
+                : "Field leaf — your photograph. First-class. The five staged cases exist only to teach."}
+            </div>
             <div className="kicker">{active.year}</div>
             <h3>{active.title}</h3>
             <p>{active.story}</p>
@@ -227,6 +269,8 @@ export default function App() {
             <div className="badges">
               <i>{active.place}</i>
               <i>{active.damage}</i>
+              <i>{active.workflow}</i>
+              <i>{active.origin}</i>
             </div>
             {result && (
               <ol className="notes">
@@ -250,16 +294,31 @@ export default function App() {
               ) : null}
               <button
                 className="tiny"
-                disabled={!result}
-                onClick={() => result && active && downloadDossier(active, result, dossier)}
+                disabled={!result || !active}
+                onClick={() =>
+                  result && active && downloadDossier(active, result, dossier, forgery, witnessNote)
+                }
               >
-                Export
+                First-aid packet
               </button>
             </div>
             <pre className="transcript">
               {dossier?.diplomatic ||
-                "The bench has enhanced the leaf. Reading is a separate, fallible act. Choose Tesseract on the binary layer, or — for a case file — a diplomatic text damaged by the measured holes."}
+                "The bench has enhanced the leaf. Reading is a separate, fallible act. Choose Tesseract on the binary layer, or — for a teaching leaf — a diplomatic text damaged by the measured holes."}
             </pre>
+            {dossier?.words.length ? (
+              <div className="wicks" aria-label="Word confidence">
+                {dossier.words.map((w, i) => (
+                  <span
+                    key={`${w.text}-${i}`}
+                    className={w.spoken ? "spoken" : "hole"}
+                    title={`${w.confidence.toFixed(0)}`}
+                  >
+                    {w.spoken ? w.text : "†"}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             {dossier && (
               <>
                 <div className="entities">
@@ -272,6 +331,39 @@ export default function App() {
                 <div className="caution">{dossier.caution}</div>
               </>
             )}
+          </div>
+        )}
+        {tab === "forge" && (
+          <div className="forge">
+            <div className="forge-banner">{forgery?.label || "FORGERY — NOT EVIDENCE"}</div>
+            <p className="forge-lede">
+              Left: the diplomatic edition — holes stay holes. Right: what a completing model
+              would invent. Palimpsest will not file the right-hand column as the page.
+            </p>
+            <div className="forge-grid">
+              <div>
+                <h4>Diplomat</h4>
+                <pre className="transcript">
+                  {dossier?.diplomatic || "Read the leaf first, or open a teaching case."}
+                </pre>
+              </div>
+              <div>
+                <h4>Forger</h4>
+                {forgery ? <ForgedText edition={forgery} /> : (
+                  <pre className="transcript">No completing model has been run against this leaf.</pre>
+                )}
+              </div>
+            </div>
+            {forgery && (
+              <ul className="forge-risks">
+                {forgery.spans.map((s) => (
+                  <li key={s.invented}>
+                    <strong>{s.invented}</strong> — {s.risk}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="caution">{forgery?.warning || "The forge is a warning, never a product."}</div>
           </div>
         )}
         {tab === "talk" && (
@@ -359,4 +451,26 @@ export default function App() {
       )}
     </div>
   );
+}
+
+function ForgedText({ edition }: { edition: ForgeryEdition }) {
+  const parts = splitOnInventions(edition.text, edition.spans.map((s) => s.invented));
+  return (
+    <pre className="transcript forged">
+      {parts.map((part, i) =>
+        part.hit ? <mark key={i}>{part.text}</mark> : <span key={i}>{part.text}</span>,
+      )}
+    </pre>
+  );
+}
+
+function splitOnInventions(text: string, needles: string[]): { text: string; hit: boolean }[] {
+  const unique = [...new Set(needles.filter(Boolean))].sort((a, b) => b.length - a.length);
+  if (!unique.length) return [{ text, hit: false }];
+  const escaped = unique.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const re = new RegExp(`(${escaped})`, "g");
+  return text.split(re).filter(Boolean).map((chunk) => ({
+    text: chunk,
+    hit: unique.includes(chunk),
+  }));
 }

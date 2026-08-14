@@ -14,9 +14,10 @@ Demo path that hits every judging axis in about 90 seconds:
 1. Prologue — stay on the opening sentence.
 2. **Enter the scriptorium** → case **01 Tenure**.
 3. Drag the brass rule. Toggle **Witness → Sauvola → Holes → Restored**.
-4. **Read → Diplomatic from witness**. Point at the `†` marks.
-5. **Talk → “What did the water take?”** then **“May I trust the names?”**
-6. **Lessons**. Stop on *The ethics of the hole*.
+4. **Read** — diplomatic text is already open on a teaching leaf. Point at the holes. Export **First-aid packet**.
+5. **Forge** — oxblood words are labeled FORGERY — NOT EVIDENCE. That column is never the page.
+6. **Talk → “Show me the forger.”** then **“What is a teaching leaf?”**
+7. **Lessons**. Stop on *The forger in the room* and *Teaching leaf vs field leaf*.
 7. Optional: **05 Inheritance** (the recipe) to show the tool is not only legal paper.
 
 Record the screen. Keep it under two minutes. Judges skim.
@@ -37,7 +38,7 @@ You may only win one named prize, but the write-up should make judges *feel* sev
 - **Best Use of Machine Learning** — unsupervised density, Sauvola, deskew, lacuna classifier
 - **Most Innovative** — recovery that refuses to hallucinate legal text
 - **Most Impactful / Sustainability AI** — climate-lost identity documents
-- **AI for Education** — the six-lesson studio
+- **AI for Education** — the eight-lesson studio
 - **Best Web AI App** — the scriptorium
 - **Conversational AI** — the archivist
 - **Data-Driven Insights** — metrics, entities, diplomatic edition

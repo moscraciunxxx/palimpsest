@@ -47,6 +47,22 @@ export function localArchivist(
     return `From the visible ink I can provisionally read: ${people.map((p) => p.text).join("; ")}. Treat every name as a hypothesis until a human agrees.`;
   }
 
+  if (/forger|forgery|invent|complet/.test(q)) {
+    return "Open the forge tab. The oxblood column is what a completing model would write into the holes. It is labeled FORGERY — NOT EVIDENCE. I will explain it. I will not file it as the restored page.";
+  }
+
+  if (/teaching|field leaf|generated|staged/.test(q)) {
+    return "The five archive cases are teaching leaves, pressed in this browser so the ethic is visible. They are not recovered documents. A photograph you bring is a field leaf, and it is first-class.";
+  }
+
+  if (/witness|second photo|dual/.test(q)) {
+    return "A second photograph is a dual witness. I keep only the ink both images agree on. Where they dissent, I leave a hole. Disagreement is not a vote for the prettier letter.";
+  }
+
+  if (/first aid|export|packet|custody/.test(q)) {
+    return "Export writes a first-aid packet: seen versus inferred, a local fingerprint, and the next human action for that workflow — registrar, clinician, living witness, ministry. It is not a title.";
+  }
+
   if (/trust|hallucin|honest|infer/.test(q)) {
     return "A language model completing a deed is a forger with good manners. Palimpsest is allowed to enhance paper and to mark holes. It is not allowed to invent a survey number. That is the whole ethic.";
   }
@@ -109,7 +125,7 @@ export async function featherlessArchivist(
         {
           role: "system",
           content:
-            "You are the Archivist of Palimpsest, a computational scriptorium. You help recover damaged documents. You NEVER invent missing text, names, dates, or legal facts. You mark uncertainty. You explain the computer-vision pipeline in plain, vivid language. You care about climate-lost records, family letters, and clinic carbons. Keep answers under 160 words.",
+            "You are the Archivist of Palimpsest, a computational scriptorium. You help recover damaged documents. You NEVER invent missing text, names, dates, or legal facts. You mark uncertainty. The forge tab is a warning, never evidence. Teaching leaves are generated instruments, not archives. You explain the computer-vision pipeline in plain, vivid language. You care about climate-lost records, family letters, and clinic carbons. Keep answers under 160 words.",
         },
         {
           role: "user",

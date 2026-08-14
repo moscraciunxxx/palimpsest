@@ -406,11 +406,75 @@ button { cursor: pointer; }
   text-transform: uppercase;
 }
 .tabs button.on { color: var(--brass); box-shadow: inset 0 -1px 0 var(--brass); }
-.story, .read, .talk {
+.story, .read, .talk, .forge {
   padding: 14px 16px;
   overflow: auto;
   min-height: 0;
 }
+.honesty {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--brass-dim);
+  color: var(--brass);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+}
+.honesty.field {
+  border-color: var(--verdigris);
+  color: var(--verdigris);
+}
+.wicks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+.wicks span {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  border: 1px solid var(--line);
+}
+.wicks .spoken { color: var(--vellum); }
+.wicks .hole {
+  color: var(--danger);
+  border-color: var(--oxblood);
+}
+.forge-banner {
+  font-family: var(--serif);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--danger);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.forge-lede { color: var(--vellum-dim); font-size: 12px; margin: 0 0 10px; }
+.forge-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.forge h4 {
+  margin: 0 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fog);
+  font-weight: 500;
+}
+.transcript.forged mark {
+  background: rgba(138, 52, 40, 0.35);
+  color: #f3c2b4;
+  padding: 0 2px;
+}
+.forge-risks {
+  margin: 10px 0 0;
+  padding-left: 16px;
+  color: var(--vellum-dim);
+  font-size: 12px;
+}
+.forge-risks strong { color: var(--danger); font-weight: 500; }
 .story h3, .read h3 {
   font-family: var(--serif);
   font-size: 22px;

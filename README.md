@@ -40,17 +40,18 @@ It runs a classical-and-unsupervised vision bench on-device:
 7. **Optional Tesseract.js** on the binary layer, and an archivist who is forbidden from inventing missing ink.
 8. **Optional Featherless** (sponsor open-weight API) if you want the archivist to speak with a larger model. The bench never needs a key.
 
-A six-lesson studio sits under **Lessons**: why paper dies, why we divide instead of subtract, why a hole must remain a hole. The instrument is also a classroom — aligned with the ML Empowerment Foundation’s reason for existing.
+An eight-lesson studio sits under **Lessons**: why paper dies, why we divide instead of subtract, why a hole must remain a hole, why the forger is shown and never filed, and why a teaching leaf is not an archive. The instrument is also a classroom — aligned with the ML Empowerment Foundation’s reason for existing.
 
 ## Key features
 
 - **Light table** with a brass compare rule: witness versus any working layer.
-- **Five filed case studies**, generated at runtime so the damage is real and the recovery is not a screenshot: a Kerala settlement deed, a 1948 family letter, a Ugandan clinic carbon, a Beira school certificate, a stained recipe card.
-- **Bring your own leaf** — any photograph, processed locally.
-- **Honest transcription** — Tesseract on Sauvola, or a diplomatic reading of a case file damaged by the measured holes. Uncertain lines marked `†`. Lacunae marked, not guessed.
-- **Provisional entities** — names, places, dates, identifiers. Hypotheses, labelled as such.
+- **Five teaching leaves**, generated at runtime and labeled as instruments, not recovered archives: a Kerala settlement deed, a 1948 family letter, a Ugandan clinic carbon, a Beira school certificate, a stained recipe card.
+- **Field leaf** — a photograph you bring is first-class, not a demo afterthought.
+- **Forger’s table** — a labeled FORGERY / NOT EVIDENCE column showing what a completing model would invent. Never the restored product.
+- **Uncertainty-aware reading** — Tesseract word confidence; below the wick the word becomes a hole. Entities are taken only from spoken ink.
+- **Dual-witness** — a second photograph; only agreeing ink is trusted. Disagreement is a hole, not a vote.
+- **First-aid packet** — seen vs inferred, a local fingerprint, and the next human action (registrar, clinician, living witness, ministry). Not a title.
 - **Archivist** — local, evidence-bound answers; optional Featherless.
-- **Export** — a markdown dossier plus the restored PNG. Nothing is uploaded to produce it.
 - **Privacy** — the document never leaves the machine unless you deliberately open Featherless.
 
 ## Who it is for

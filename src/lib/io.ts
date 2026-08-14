@@ -1,6 +1,7 @@
+import { WORKFLOW_NEXT, type CaseFile } from "../cases/catalog";
 import { drawImageElement, imageToCanvas } from "../engine/pixels";
-import type { CaseFile } from "../cases/catalog";
-import type { Dossier, PipelineResult } from "../engine/types";
+import type { Dossier, ForgeryEdition, PipelineResult } from "../engine/types";
+import { leafFingerprint } from "../engine/witness";
 
 export function loadUserImage(file: File): Promise<ImageData> {
   return new Promise((resolve, reject) => {
@@ -19,15 +20,29 @@ export function loadUserImage(file: File): Promise<ImageData> {
 }
 
 export function downloadDossier(
-  file: CaseFile | { title: string; place: string; year: string },
+  file: CaseFile,
   result: PipelineResult,
   dossier: Dossier | null,
+  forgery: ForgeryEdition | null,
+  witnessNote?: string,
 ) {
+  const print = leafFingerprint(result.layers.original);
   const md = [
-    `# Palimpsest dossier — ${file.title}`,
+    `# Palimpsest first-aid packet — ${file.title}`,
     ``,
-    `Place: ${file.place}`,
-    `Date: ${file.year}`,
+    `This is not a legal restoration, a title, a credential, or a medical record.`,
+    `It is a chain-of-custody note for what the camera still saw.`,
+    ``,
+    `## Leaf`,
+    `- Origin: ${file.origin === "teaching" ? "teaching instrument (generated in-browser, not an archive)" : "field photograph"}`,
+    `- Workflow: ${file.workflow}`,
+    `- Place: ${file.place}`,
+    `- Date on the leaf: ${file.year}`,
+    `- Witness fingerprint (local, non-cryptographic): ${print}`,
+    witnessNote ? `- Dual-witness: ${witnessNote}` : `- Dual-witness: none — a second photograph was not offered`,
+    ``,
+    `## Next human action`,
+    WORKFLOW_NEXT[file.workflow],
     ``,
     `## Instrument readings`,
     `- Skew: ${result.metrics.skewDegrees.toFixed(2)}°`,
@@ -39,14 +54,33 @@ export function downloadDossier(
     `## Method notes`,
     ...result.notes.map((n) => `- ${n}`),
     ``,
-    `## Diplomatic transcription`,
+    `## Seen (diplomatic)`,
     ``,
     "```",
     dossier?.diplomatic || "(not yet read)",
     "```",
     ``,
-    `## Entities (provisional)`,
-    ...(dossier?.entities.map((e) => `- (${e.type}) ${e.text}`) || ["- none"]),
+    `## Spoken ink only (confidence ≥ 62)`,
+    ``,
+    "```",
+    dossier?.spokenOnly || "(not yet read)",
+    "```",
+    ``,
+    `## Inferred (holes, not letters)`,
+    ...(dossier?.inferredSpans.map((s) => `- ${s.text} — ${s.reason}`) || ["- none marked"]),
+    ``,
+    `## Entities from spoken ink only`,
+    ...(dossier?.entities.map((e) => `- (${e.type}, ${e.confidence.toFixed(2)}) ${e.text}`) || [
+      "- none",
+    ]),
+    ``,
+    `## Forgery table (NOT EVIDENCE)`,
+    forgery
+      ? [
+          forgery.warning,
+          ...forgery.spans.map((s) => `- Invented “${s.invented}” into ${s.hole}: ${s.risk}`),
+        ].join("\n")
+      : "Not generated.",
     ``,
     `## Caution`,
     dossier?.caution || "Treat all recoveries as drafts.",
@@ -57,7 +91,7 @@ export function downloadDossier(
   const blob = new Blob([md], { type: "text/markdown" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `palimpsest-${file.title.toLowerCase().replace(/\s+/g, "-")}.md`;
+  a.download = `palimpsest-first-aid-${file.title.toLowerCase().replace(/\s+/g, "-")}.md`;
   a.click();
   URL.revokeObjectURL(a.href);
 

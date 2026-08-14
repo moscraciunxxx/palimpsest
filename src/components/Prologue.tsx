@@ -17,7 +17,8 @@ export function Prologue({ onEnter }: Props) {
             Palimpsest is first aid for paper. It runs a full computer-vision bench —
             illumination correction, Beer–Lambert ink separation, Sauvola
             thresholding, lacuna ethics — entirely in your browser, so a flood-stained
-            deed never has to visit a stranger’s server.
+            deed never has to visit a stranger’s server. A completing model is shown
+            on a forger’s table and never filed as the page.
           </p>
           <div className="facts">
             <div>
@@ -37,7 +38,7 @@ export function Prologue({ onEnter }: Props) {
             <button className="btn" onClick={onEnter}>
               Enter the scriptorium
             </button>
-            <span className="fine">On-device · no account · five case files</span>
+            <span className="fine">On-device · no account · five teaching leaves · bring a field photograph</span>
           </div>
         </div>
         <p className="fine">

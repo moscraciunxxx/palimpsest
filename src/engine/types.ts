@@ -54,9 +54,30 @@ export interface Entity {
   confidence: number;
 }
 
+export interface WordReading {
+  text: string;
+  confidence: number;
+  spoken: boolean;
+}
+
+export interface ForgerySpan {
+  invented: string;
+  hole: string;
+  risk: string;
+}
+
+export interface ForgeryEdition {
+  label: "FORGERY — NOT EVIDENCE";
+  text: string;
+  spans: ForgerySpan[];
+  warning: string;
+}
+
 export interface Dossier {
   rawText: string;
   diplomatic: string;
+  spokenOnly: string;
+  words: WordReading[];
   reconstruction: string;
   inferredSpans: { text: string; reason: string }[];
   entities: Entity[];
