@@ -63,6 +63,8 @@ When identity is paper, a flood is a deletion event. Palimpsest treats recovery 
 
 ## Try it
 
+Live demo (no install): https://moscraciunxxx.github.io/palimpsest/
+
 ```
 npm install
 npm run dev

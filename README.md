@@ -4,12 +4,14 @@
 
 Recover what time, water, and forgetting tried to erase — entirely in the browser.
 
+**Live demo (no install):** https://moscraciunxxx.github.io/palimpsest/
+
 ```
 npm install
 npm run dev
 ```
 
-Open the printed address. Enter the scriptorium. Pull a leaf from the archive.
+Open the printed address, or the live demo above. Enter the scriptorium. Pull a leaf from the archive.
 
 ---
 
